@@ -3,13 +3,15 @@
 #include "arvore.h"
 
 struct NO {
-    int info;
+    char* caminhoArquivo;
+    char* nomeArquivo;
+    char extensaoArquivo; 
     struct NO *esq;
     struct NO *dir;
 };
 
-ArvBin* criarArvore(){
-    ArvBin* raiz = (ArvBin*) malloc(sizeof(ArvBin));
+Arvore* criarArvore(){
+    Arvore* raiz = (Arvore*) malloc(sizeof(Arvore));
     if(raiz != NULL)
         *raiz = NULL;
     return raiz;
@@ -24,21 +26,21 @@ void liberarNO(struct NO* no){
     no = NULL;
 }
 
-void liberarArvore(ArvBin* raiz){
+void liberarArvore(Arvore* raiz){
     if(raiz == NULL)
         return;
-    liberarNO(*raiz);//libera cada n�
-    free(raiz);//libera a raiz
+    liberarNO(*raiz);
+    free(raiz);
 }
 
-int inserirArvore(ArvBin* raiz, int valor){
+int inserirArvore(Arvore* raiz, int valor){
     if(raiz == NULL)
         return 0;
     struct NO* novo;
     novo = (struct NO*) malloc(sizeof(struct NO));
     if(novo == NULL)
         return 0;
-    novo->info = valor;
+    novo->caminhoArquivo = valor;
     novo->dir = NULL;
     novo->esq = NULL;
 
@@ -49,17 +51,17 @@ int inserirArvore(ArvBin* raiz, int valor){
         struct NO* ant = NULL;
         while(atual != NULL){
             ant = atual;
-            if(valor == atual->info){
+            if(valor == atual->caminhoArquivo){
                 free(novo);
-                return 0;//elemento j� existe
+                return 0;
             }
 
-            if(valor > atual->info)
+            if(valor > atual->caminhoArquivo)
                 atual = atual->dir;
             else
                 atual = atual->esq;
         }
-        if(valor > ant->info)
+        if(valor > ant->caminhoArquivo)
             ant->dir = novo;
         else
             ant->esq = novo;
@@ -67,13 +69,13 @@ int inserirArvore(ArvBin* raiz, int valor){
     return 1;
 }
 
-int removerArvore(ArvBin *raiz, int valor){
+int removerArvore(Arvore *raiz, int valor){
     if(raiz == NULL)
         return 0;
     struct NO* ant = NULL;
     struct NO* atual = *raiz;
     while(atual != NULL){
-        if(valor == atual->info){
+        if(valor == atual->caminhoArquivo){
             if(atual == *raiz)
                 *raiz = removerNoAtual(atual);
             else{
@@ -85,7 +87,7 @@ int removerArvore(ArvBin *raiz, int valor){
             return 1;
         }
         ant = atual;
-        if(valor > atual->info)
+        if(valor > atual->caminhoArquivo)
             atual = atual->dir;
         else
             atual = atual->esq;
@@ -93,7 +95,7 @@ int removerArvore(ArvBin *raiz, int valor){
     return 0;
 }
 
-int arvoreVazia(ArvBin *raiz){
+int arvoreVazia(Arvore *raiz){
     if(raiz == NULL)
         return 1;
     if(*raiz == NULL)
@@ -123,7 +125,7 @@ struct NO* removerNoAtual(struct NO* atual) {
     return no2;
 }
 
-int alturaArvore(ArvBin *raiz){
+int alturaArvore(Arvore *raiz){
     if (raiz == NULL)
         return 0;
     if (*raiz == NULL)
@@ -136,51 +138,51 @@ int alturaArvore(ArvBin *raiz){
         return(alt_dir + 1);
 }
 
-void preOrdemArvore(ArvBin *raiz){
+void preOrdemArvore(Arvore *raiz){
     if(raiz == NULL)
         return;
     if(*raiz != NULL){
-        printf("%d\n",(*raiz)->info);
+        printf("%d\n",(*raiz)->caminhoArquivo);
         preOrdemArvore(&((*raiz)->esq));
         preOrdemArvore(&((*raiz)->dir));
     }
 }
 
-void emOrdemArvore(ArvBin *raiz) {
+void emOrdemArvore(Arvore *raiz) {
     if(raiz == NULL)
         return;
     if(*raiz != NULL){
         emOrdemArvore(&((*raiz)->esq));
-        printf("%d\n",(*raiz)->info);
+        printf("%d\n",(*raiz)->caminhoArquivo);
         emOrdemArvore(&((*raiz)->dir));
     }
 }
 
-void posOrdemArvore(ArvBin *raiz) {
+void posOrdemArvore(Arvore *raiz) {
     if(raiz == NULL)
         return;
     if(*raiz != NULL){
         posOrdemArvore(&((*raiz)->dir));
         posOrdemArvore(&((*raiz)->esq));
-        printf("%d\n",(*raiz)->info);
+        printf("%d\n",(*raiz)->caminhoArquivo);
     }
 }
 
-int totalNosArvore(ArvBin *raiz) {
+int totalNosArvore(Arvore *raiz) {
     if(raiz == NULL || *raiz == NULL)
         return 0;
     return 1 + totalNosArvore(&((*raiz)->esq)) + totalNosArvore(&((*raiz)->dir));
 }
 
-int consultarArvore(ArvBin *raiz, int valor) {
+int consultarArvore(Arvore *raiz, int valor) {
     if (raiz == NULL || *raiz == NULL)
         return 0;
     struct NO *atual = *raiz;
     while (atual != NULL) {
-        if (atual->info == valor) {
+        if (atual->caminhoArquivo == valor) {
             return 1;
         }
-        if (valor > atual->info)
+        if (valor > atual->caminhoArquivo)
             atual = atual->dir;
         else
             atual = atual->esq;
@@ -208,4 +210,44 @@ struct NO* Remove_ArvoreAtual(struct NO* atual) {
     no2->dir = atual->dir;
     free(atual);
     return no2;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+/*
+    Entra no diretório especificado se ele existir, se ele não existe,
+    então imprimi as possíveis alternativas, Ex: diretório = “Me” deve
+    informar que existe um diretório “Meus Documentos” e “Meus Downloads”
+    senão existe alternativas então imprimi “Diretório não encontrado”
+*/
+int cd(char* diretorio) {
+    return 0;
+}
+
+/*
+    Busca um arquivo ou pasta pelo seu nome “arg” e informa a sua localização.
+*/
+char* search(char* arg) {
+    return NULL;
+}
+
+/*
+    Remove um pasta e seus arquivos, deve fazer uma liberação recursiva.
+*/
+int rm(char* diretorio) {
+    return 0;
+}   
+
+/*
+    Lista todos os componentes dentro da pasta atual.
+*/
+int list(char* diretorio) {
+    return 0;
+}
+
+/*
+    Cria uma pasta com o nome “arg” na pasta atual.
+*/
+int mkdir(char* arg) {
+    return 0;
 }
