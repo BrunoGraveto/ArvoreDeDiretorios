@@ -16,10 +16,10 @@ void preOrdemArvore(Arvore *raiz);
 void emOrdemArvore(Arvore *raiz);
 void posOrdemArvore(Arvore *raiz);
 
-int cd(char* diretorio);
-char* search(char* arg);
-int rm(char* diretorio);
-int list(char* diretorio);
-int mkdir(char* arg);
+int cd(Arvore* raiz, char* diretorio);
+char* search(Arvore* raiz, char* arg);
+int rm(Arvore* raiz, char* diretorio);
+int list(Arvore* raiz, char* diretorio);
+int mkdir(Arvore* raiz, char* arg);
 
 #endif

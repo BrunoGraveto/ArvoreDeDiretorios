@@ -220,34 +220,34 @@ struct NO* Remove_ArvoreAtual(struct NO* atual) {
     informar que existe um diretório “Meus Documentos” e “Meus Downloads”
     senão existe alternativas então imprimi “Diretório não encontrado”
 */
-int cd(char* diretorio) {
+int cd(Arvore* raiz, char* diretorio) {
     return 0;
 }
 
 /*
     Busca um arquivo ou pasta pelo seu nome “arg” e informa a sua localização.
 */
-char* search(char* arg) {
+char* search(Arvore* raiz, char* arg) {
     return NULL;
 }
 
 /*
     Remove um pasta e seus arquivos, deve fazer uma liberação recursiva.
 */
-int rm(char* diretorio) {
+int rm(Arvore* raiz, char* diretorio) {
     return 0;
 }   
 
 /*
     Lista todos os componentes dentro da pasta atual.
 */
-int list(char* diretorio) {
+int list(Arvore* raiz, char* diretorio) {
     return 0;
 }
 
 /*
     Cria uma pasta com o nome “arg” na pasta atual.
 */
-int mkdir(char* arg) {
+int mkdir(Arvore* raiz, char* arg) {
     return 0;
 }
