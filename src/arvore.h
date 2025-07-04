@@ -6,9 +6,9 @@ typedef struct NO {
     char *caminho;
     char *nome;
     char extensao;
-    NO *prox;
-    NO *pai;
-    NO *filho;
+    NO *pai; // Pasta pai
+    NO *filho; // Arquivos
+    NO *irmao; // Pastas
 } NO;
 
 // Struct Arvore

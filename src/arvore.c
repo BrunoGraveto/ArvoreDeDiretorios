@@ -54,6 +54,5 @@ int mkdir(Arvore* raiz, char* arg) {
     if (no == NULL) 
         return 0;
     
-    
     return 1;
 }
