@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #ifndef ARVORE_H
 #define ARVORE_H
 
@@ -20,9 +24,12 @@ int uploadArquivos(Arvore* raiz, char* caminho);
 
 // Funções de usuário
 int cd(Arvore* raiz, char* diretorio);
-char* search(Arvore* raiz, char* arg);
-int rm(Arvore* raiz, char* diretorio);
+char* search(Arvore* raiz, char* arg); //busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”  e  informa  a sua localização
+int rm(Arvore* raiz, char* diretorio); //Remove uma pasta e seus arquivos
 int list(Arvore* raiz, char* diretorio);
 int mkdir(Arvore* raiz, char* arg);
+
+//Funções Extras
+//bo adicionar as extrar aqui pra separar e deixar bonitinho
 
 #endif

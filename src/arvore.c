@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "arvore.h"
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -41,6 +39,32 @@ int cd(Arvore* raiz, char* diretorio) {
     Busca um arquivo ou pasta pelo seu nome “arg” e informa a sua localização.
 */
 char* search(Arvore* raiz, char* arg) {
+    if (raiz == NULL || *raiz == NULL || arg == NULL) return NULL;
+
+    NO* atual = *raiz;
+    NO* ult = NULL; // Último nó visitado, usado para evitar voltar ao mesmo nó
+
+    while (atual != NULL) {
+        if (atual->nome != NULL && strcmp(atual->nome, arg) == 0)
+            return atual->caminho;
+    
+        if (atual->filho != NULL && ult != atual->filho) {
+
+            ult = atual;
+            atual = atual->filho;
+
+        } else if (atual->irmao != NULL && ult != atual->irmao) {
+
+            ult = atual;
+            atual = atual->irmao;
+
+        } else {
+
+            ult = atual;
+            atual = atual->pai; // Volta para o pai se não tiver mais filhos ou irmãos
+        }
+    }
+
     return NULL;
 }
 
@@ -72,4 +96,6 @@ int mkdir(Arvore* raiz, char* arg) {
     return 1;
 }
 
-
+//////////////////////////////////////////////////////////////////////////////////
+// Funções Extras  ////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
