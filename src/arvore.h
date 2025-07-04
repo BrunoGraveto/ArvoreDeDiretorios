@@ -1,21 +1,20 @@
 #ifndef ARVORE_H
 #define ARVORE_H
 
+// Struct Nó
+typedef struct NO {
+    char *caminho;
+    char *nome;
+    char extensao;
+    NO *prox;
+    NO *pai;
+    NO *filho;
+} NO;
+
+// Struct Arvore
 typedef struct NO* Arvore;
 
-Arvore* criarArvore();
-void liberarArvore(Arvore *raiz);
-int inserirArvore(Arvore* raiz, int valor);
-int removerArvore(Arvore *raiz, int valor);
-struct NO* removerNoAtual(struct NO* atual);
-int arvoreVazia(Arvore *raiz);
-int alturaArvore(Arvore *raiz);
-int totalNosArvore(Arvore *raiz);
-int consultarArvore(Arvore *raiz, int valor);
-void preOrdemArvore(Arvore *raiz);
-void emOrdemArvore(Arvore *raiz);
-void posOrdemArvore(Arvore *raiz);
-
+// Funções
 int cd(Arvore* raiz, char* diretorio);
 char* search(Arvore* raiz, char* arg);
 int rm(Arvore* raiz, char* diretorio);
