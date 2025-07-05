@@ -1,5 +1,7 @@
 #include "arvore.h"
 
+#define QTD_CARACTERES_LEITURA 300
+
 //////////////////////////////////////////////////////////////////////////////////
 // Funções Internas //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
@@ -17,8 +19,33 @@ Arvore* criarArvore() {
 /*
     Lê varios arquivos de um txt e coloca na arvore e insere
 */
-int uploadArquivos(Arvore* raiz, char* caminho) {
+int uploadArvore(Arvore* raiz, char* caminho) {
+    if (raiz == NULL) // Lembrar de ver para adicionar verificação de *raiz
+        return 0;
+    FILE *arquivo = fopen("exemplo.txt", "r");
+    if (arquivo == NULL) 
+        return 0;
+    char linha[QTD_CARACTERES_LEITURA];
+    while (fscanf(arquivo, "%[^\n]", linha) != EOF) {
 
+    }
+    fclose(arquivo);
+    return 1;
+}
+
+/*
+    Função auxiliar para remoções recursivas, de um nó e toda sua sub-arvore
+*/
+void removeRec (NO* no){
+    if(no == NULL) return;
+
+    removeRec(no->filho);
+    removeRec(no->irmao);
+
+    free(no->caminho);
+    free(no->nome);
+    free(no->extensao);
+    free(no);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +92,7 @@ char* search(Arvore* raiz, char* arg) {
     if (raiz == NULL || *raiz == NULL || arg == NULL) return NULL;
 
     NO* atual = *raiz;
-    NO* ult = NULL; // Último nó visitado, usado para evitar voltar ao mesmo nó
+    NO* ult = NULL; // Último nó visitado
 
     while (atual != NULL) {
         if (atual->nome != NULL && strcmp(atual->nome, arg) == 0)
@@ -95,9 +122,58 @@ char* search(Arvore* raiz, char* arg) {
     Remove um pasta e seus arquivos, deve fazer uma liberação recursiva.
 */
 int rm(Arvore* raiz, char* diretorio) {
+    if (raiz == NULL || *raiz == NULL || diretorio == NULL) {
+        return 0;
+    }
 
-    return 0;
-}   
+    NO* atual = *raiz;
+    NO* ult = NULL;
+
+    while (atual != NULL) {
+        if (strcmp(atual->nome, diretorio) == 0) {
+            
+            if (atual->pai == NULL) { 
+                *raiz = atual->irmao;
+
+            } else {
+                
+                if (atual->pai->filho == atual) {
+                    atual->pai->filho = atual->irmao;
+
+                } else {
+
+                    NO* irmaoAnt = atual->pai->filho;
+                    while (irmaoAnt != NULL && irmaoAnt->irmao != atual) {
+                        irmaoAnt = irmaoAnt->irmao;
+                    }
+                    if (irmaoAnt != NULL) {
+                        irmaoAnt->irmao = atual->irmao;
+                    }
+                }
+            }
+            
+            atual->irmao = NULL; 
+            removeRec(atual);
+            
+            return 1;
+        }
+
+        if (atual->filho != NULL && ult != atual->filho) {
+            ult = atual;
+            atual = atual->filho;
+
+        } else if (atual->irmao != NULL && ult != atual->irmao) {
+            ult = atual;
+            atual = atual->irmao;
+
+        } else {
+            ult = atual;
+            atual = atual->pai;
+        }
+    }
+
+    return 0; // Não encontrou
+}
 
 /*
     Lista todos os componentes dentro da pasta atual.
@@ -264,3 +340,4 @@ void help() {
 //////////////////////////////////////////////////////////////////////////////////
 // Funções Extras  ////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
+

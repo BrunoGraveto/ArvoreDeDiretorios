@@ -20,7 +20,7 @@ typedef struct NO* Arvore;
 
 // Funções internas
 Arvore* criarArvore();
-int uploadArquivos(Arvore* raiz, char* caminho);
+int uploadArvore(Arvore* raiz, char* caminho);
 
 // Funções de usuário
 Arvore cd(Arvore raiz, char* diretorio);
@@ -33,6 +33,6 @@ void help(); //Exibe o menu de ajuda
 void liberarArvore(Arvore* raiz); //Libera a memória alocada para a árvore
 
 //Funções Extras
-//bo adicionar as extras aqui pra separar e deixar bonitinho
+void removeRec (NO* no);
 
 #endif
