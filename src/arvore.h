@@ -31,5 +31,6 @@ int list(Arvore* raiz, char* diretorio);
 int mkdir(Arvore* raiz, char* arg);
 
 //Funções Extras
+int listAll(Arvore* raiz, char* diretorio);
 
 #endif

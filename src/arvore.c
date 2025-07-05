@@ -143,7 +143,29 @@ int rm(Arvore* raiz, char* diretorio) {
 /*
     Lista todos os componentes dentro da pasta atual.
 */
-int list(Arvore* raiz, char* diretorio) {
+
+
+/*
+    Cria uma pasta com o nome “arg” na pasta atual.
+*/
+int mkdir(Arvore* raiz, char* arg) {
+    if (raiz == NULL)
+        return 0;
+    NO *no = (NO*) malloc(sizeof(NO));
+    if (no == NULL) 
+        return 0;
+    
+    return 1;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// Funções Extras  ////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+/*
+    Função para Imprimir todos os arquivos presente em uma pasta, mas com busca global na Arvore
+*/
+int listAll(Arvore* raiz, char* diretorio) {
     if(raiz == NULL || *raiz == NULL || diretorio == NULL){
         return 0;
     }
@@ -183,21 +205,3 @@ int list(Arvore* raiz, char* diretorio) {
     }
     return 0;
 }
-
-/*
-    Cria uma pasta com o nome “arg” na pasta atual.
-*/
-int mkdir(Arvore* raiz, char* arg) {
-    if (raiz == NULL)
-        return 0;
-    NO *no = (NO*) malloc(sizeof(NO));
-    if (no == NULL) 
-        return 0;
-    
-    return 1;
-}
-
-//////////////////////////////////////////////////////////////////////////////////
-// Funções Extras  ////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////
-
