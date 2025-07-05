@@ -379,6 +379,11 @@ void help() {
 // Funções Extras  ////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
+/*
+    Renomeia um arquivo ou diretório.
+    Se o nome antigo não for encontrado, imprime uma mensagem de erro.
+    Se o nome novo já existir, também imprime uma mensagem de erro.
+*/
 int rename(Arvore* raiz, char* nome_antigo, char* nome_novo) {
     if (raiz == NULL || *raiz == NULL || nome_antigo == NULL || nome_novo == NULL) {
         printf("Árvore não inicializada ou nomes inválidos.\n");
@@ -403,6 +408,11 @@ int rename(Arvore* raiz, char* nome_antigo, char* nome_novo) {
     return 0;
 }
 
+/*
+    Exibe a mensagem especificada.
+    Se a mensagem for NULL, imprime "Mensagem inválida."
+*/
+
 int echo(char* mensagem) {
     if (mensagem == NULL) {
         printf("Mensagem inválida.\n");
@@ -410,4 +420,49 @@ int echo(char* mensagem) {
     }
     printf("%s\n", mensagem);
     return 1;
+}
+
+/*
+    Função para Imprimir todos os arquivos presente em uma pasta, mas com busca global na Arvore
+*/
+
+int listAll(Arvore* raiz, char* diretorio) {
+    if(raiz == NULL || *raiz == NULL || diretorio == NULL){
+        return 0;
+    }
+
+    NO* atual = *raiz;
+    NO* ult = NULL;
+
+    while(atual != NULL){
+        if(strcmp(atual->nome, diretorio) == 0){
+            NO* comp = atual->filho;
+
+            if(comp == NULL){
+                printf("vazio\n");
+                return 1;
+            }
+
+            printf("\nArquivos da Pasta %s\n", diretorio);
+            while(comp != NULL){
+                printf("- %s\n", comp->nome);
+                comp = comp->irmao;
+            }
+            return 1;
+        }
+
+        if (atual->filho != NULL && ult != atual->filho) {
+            ult = atual;
+            atual = atual->filho;
+
+        } else if (atual->irmao != NULL && ult != atual->irmao) {
+            ult = atual;
+            atual = atual->irmao;
+
+        } else {
+            ult = atual;
+            atual = atual->pai;
+        }
+    }
+    return 0;
 }
