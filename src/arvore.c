@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "arvore.h"
 
 #define QTD_CARACTERES_LEITURA 300
@@ -17,26 +20,52 @@ Arvore* criarArvore() {
 }
 
 /*
-    Lê varios arquivos de um txt e coloca na arvore e insere
+    Le caminhos de um txt e coloca em uma arvore:
 */
-int uploadArvore(Arvore* raiz, char* caminho) {
-    if (raiz == NULL) // Lembrar de ver para adicionar verificação de *raiz
+int uploadArvore(Arvore* raiz, char* caminhoArquivo) {
+    if (raiz == NULL)
         return 0;
-    FILE *arquivo = fopen("exemplo.txt", "r");
-    if (arquivo == NULL) 
-        return 0;
-    char linha[QTD_CARACTERES_LEITURA];
-    while (fscanf(arquivo, "%[^\n]", linha) != EOF) {
 
+    FILE *arquivo = fopen(caminhoArquivo, "r");
+    if (arquivo == NULL)
+        return 0;
+
+    char linha[QTD_CARACTERES_LEITURA];
+
+    while (fscanf(arquivo, " %[^\n]", linha) == 1) {
+        char caminho[QTD_CARACTERES_LEITURA];
+        strcpy(caminho, linha);
+
+        char* parte = strtok(caminho, "/");
+        char caminhoParcial[QTD_CARACTERES_LEITURA] = "";
+
+        while (parte != NULL) {
+            if (strlen(caminhoParcial) > 0)
+                strcat(caminhoParcial, "/");
+            strcat(caminhoParcial, parte);
+
+            NO* encontrado = searchPorCaminho(raiz, caminhoParcial);
+            if (encontrado == NULL) {
+                if (strchr(parte, '.') != NULL) {
+                    mkarq(raiz, caminhoParcial);
+                } else {
+                    mkdir(raiz, caminhoParcial);
+                }
+            }
+
+            parte = strtok(NULL, "/");
+        }
     }
+
     fclose(arquivo);
     return 1;
 }
 
+
 /*
-    Função auxiliar para remoções recursivas, de um nó e toda sua sub-arvore
+    Função auxiliar para remoções recursivas, de um nó e toda sua sub-arvore:
 */
-void removeRec (NO* no){
+void removeRec(NO* no) {
     if(no == NULL) return;
 
     removeRec(no->filho);
@@ -46,6 +75,93 @@ void removeRec (NO* no){
     free(no->nome);
     free(no->extensao);
     free(no);
+}
+
+/*
+    Verifica se existe um arquivo por um caminho completo:
+*/
+NO* searchPorCaminho(Arvore* raiz, char* caminhoCompleto) {
+    if (raiz == NULL || *raiz == NULL || caminhoCompleto == NULL)
+        return NULL;
+
+    NO *pilha[QTD_CARACTERES_LEITURA];
+    int topo = 0;
+    pilha[topo++] = *raiz;
+
+    while (topo > 0) {
+        NO *atual = pilha[--topo];
+
+        if (atual->caminho != NULL && strcmp(atual->caminho, caminhoCompleto) == 0)
+            return atual;
+
+        if (atual->irmao)
+            pilha[topo++] = atual->irmao;
+        if (atual->filho)
+            pilha[topo++] = atual->filho;
+    }
+
+    return NULL;
+}
+
+/*
+    Busca pelo pai de um arquivo ou pasta:
+*/
+NO* buscarPai(Arvore* raiz, char* caminhoCompleto) {
+    if (caminhoCompleto == NULL || raiz == NULL || *raiz == NULL)
+        return NULL;
+
+    char caminhoPai[QTD_CARACTERES_LEITURA];
+    strcpy(caminhoPai, caminhoCompleto);
+
+    char *barra = strrchr(caminhoPai, '/');
+    if (barra != NULL) {
+        *barra = '\0'; // corta o último componente para pegar o pai
+    } else {
+        // Não tem pai (raiz)
+        return NULL;
+    }
+
+    // Se caminhoPai ficar vazio, significa que o pai é raiz
+    if (strlen(caminhoPai) == 0)
+        return *raiz;
+
+    return (NO*) searchPorCaminho(raiz, caminhoPai);
+}
+
+/*
+    Insere um NÓ (Arquivo ou Pasta):
+*/
+void inserirNo(Arvore* raiz, NO* pai, NO* novoNo) {
+    if (pai != NULL) {
+        if (pai->filho == NULL) {
+            pai->filho = novoNo;
+        } else {
+            NO *irm = pai->filho;
+            while (irm->irmao != NULL)
+                irm = irm->irmao;
+            irm->irmao = novoNo;
+        }
+    } else {
+        if (*raiz == NULL) {
+            *raiz = novoNo;
+        } else {
+            NO *atual = *raiz;
+            while (atual->irmao != NULL)
+                atual = atual->irmao;
+            atual->irmao = novoNo;
+        }
+    }
+}
+
+/*
+    Libera a arvore toda:
+*/
+void liberarArvore(Arvore* raiz) {
+    if (raiz == NULL || *raiz == NULL)
+        return;
+
+    removeRec(*raiz); // Libera recursivamente todos os nós
+    *raiz = NULL;     // Garante que o ponteiro da raiz aponte para NULL
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -82,32 +198,58 @@ NO* cd(NO* atual, char* diretorio) {
 }
 
 /*
-    Busca um arquivo ou pasta pelo seu nome “arg” e informa a sua localização.
+    Busca um arquivo ou pasta pelo seu nome “arg” e informa a sua localização:
 */
+// char* search(Arvore* raiz, char* arg) {
+//     if (raiz == NULL || *raiz == NULL || arg == NULL) 
+//         return NULL;
+
+//     NO* atual = *raiz;
+//     NO* ult = NULL; // Último nó visitado
+
+//     while (atual != NULL) {
+//         if (atual->nome != NULL && strcmp(atual->nome, arg) == 0)
+//             return atual->caminho;
+    
+//         if (atual->filho != NULL && ult != atual->filho) {
+
+//             ult = atual;
+//             atual = atual->filho;
+
+//         } else if (atual->irmao != NULL && ult != atual->irmao) {
+
+//             ult = atual;
+//             atual = atual->irmao;
+
+//         } else {
+
+//             ult = atual;
+//             atual = atual->pai; // Volta para o pai se não tiver mais filhos ou irmãos
+//         }
+//     }
+
+//     return NULL;
+// }
 char* search(Arvore* raiz, char* arg) {
-    if (raiz == NULL || *raiz == NULL || arg == NULL) return NULL;
+    if (raiz == NULL || *raiz == NULL || arg == NULL)
+        return NULL;
 
     NO* atual = *raiz;
-    NO* ult = NULL; // Último nó visitado
 
     while (atual != NULL) {
         if (atual->nome != NULL && strcmp(atual->nome, arg) == 0)
             return atual->caminho;
-    
-        if (atual->filho != NULL && ult != atual->filho) {
 
-            ult = atual;
+        if (atual->filho != NULL) {
             atual = atual->filho;
-
-        } else if (atual->irmao != NULL && ult != atual->irmao) {
-
-            ult = atual;
+        } else if (atual->irmao != NULL) {
             atual = atual->irmao;
-
         } else {
-
-            ult = atual;
-            atual = atual->pai; // Volta para o pai se não tiver mais filhos ou irmãos
+            // Volta até encontrar um nó com irmão não visitado
+            while (atual != NULL && atual->irmao == NULL)
+                atual = atual->pai;
+            if (atual != NULL)
+                atual = atual->irmao;
         }
     }
 
@@ -115,12 +257,11 @@ char* search(Arvore* raiz, char* arg) {
 }
 
 /*
-    Remove um pasta e seus arquivos, deve fazer uma liberação recursiva.
+    Remove um pasta e seus arquivos, deve fazer uma liberação recursiva:
 */
 int rm(Arvore* raiz, char* diretorio) {
-    if (raiz == NULL || *raiz == NULL || diretorio == NULL) {
+    if (raiz == NULL || *raiz == NULL || diretorio == NULL) 
         return 0;
-    }
 
     NO* atual = *raiz;
     NO* ult = NULL;
@@ -172,38 +313,110 @@ int rm(Arvore* raiz, char* diretorio) {
 }
 
 /*
-    Lista todos os componentes dentro da pasta atual.
+    Lista todos os componentes dentro da pasta atual:
 */
 int list(Arvore* raiz) {
     if(raiz == NULL || *raiz == NULL) {
+        printf("a");
         return 0;
     }
     char* diretorio = (*raiz)->nome ? (*raiz)->nome : "raiz"; // Se não tiver nome, assume raiz
 
     NO* atual = *raiz;
 
-    printf("Conteúdo do diretório '%s':\n", diretorio);
+    printf("\n%s/\n", diretorio);
     NO* filho = atual->filho;
     if (filho == NULL) {
         printf("Diretório vazio.\n");
     }
     while (filho != NULL) {
-        printf("- %s\n", filho->nome);
+        printf("    %s\n", filho->nome);
         filho = filho->irmao;
     }
+    printf("\n");
     return 1;
 }
 
 /*
-    Cria uma pasta com o nome “arg” na pasta atual.
+    Cria uma pasta com o nome “arg” na pasta atual:
 */
-int mkdir(Arvore* raiz, char* arg) {
-    if (raiz == NULL)
+int mkdir(Arvore* raiz, char* caminhoCompleto) {
+    if (raiz == NULL || caminhoCompleto == NULL)
         return 0;
+
+    // Extrai o nome do diretório do caminho
+    char *nome = strrchr(caminhoCompleto, '/');
+    nome = (nome != NULL) ? nome + 1 : caminhoCompleto;
+
+    // Cria o novo nó
     NO *no = (NO*) malloc(sizeof(NO));
-    if (no == NULL) 
+    if (no == NULL)
         return 0;
-    
+
+    no->caminho = strdup(caminhoCompleto);
+    no->nome = strdup(nome);
+    no->extensao = NULL; // Pasta não tem extensão
+    no->filho = NULL;
+    no->irmao = NULL;
+    no->pai = NULL;
+
+    // Buscar pai
+    NO* pai = buscarPai(raiz, caminhoCompleto);
+    no->pai = pai;
+
+    inserirNo(raiz, pai, no);
+
+    return 1;
+}
+
+/*
+    Sair do Programa e liberar a Árvore:
+*/
+int exitPrograma(Arvore* raiz) {
+    if (raiz == NULL || *raiz == NULL) {
+        printf("Árvore não inicializada.\n");
+        return 0;
+    }
+    liberarArvore(raiz);
+    return 1;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+// Funções Extras  ///////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+
+/*
+    Cria um arquivo:
+*/
+int mkarq(Arvore* raiz, char* caminhoCompleto) {
+    if (raiz == NULL || caminhoCompleto == NULL)
+        return 0;
+
+    char *nome = strrchr(caminhoCompleto, '/');
+    nome = (nome != NULL) ? nome + 1 : caminhoCompleto;
+
+    // Detectar extensão
+    char *extensao = strrchr(nome, '.');
+    if (extensao == NULL)
+        return 0; 
+
+    NO *no = (NO*) malloc(sizeof(NO));
+    if (no == NULL)
+        return 0;
+
+    no->caminho = strdup(caminhoCompleto);
+    no->nome = strdup(nome);
+    no->extensao = strdup(extensao); // Inclui o ponto
+    no->filho = NULL;
+    no->irmao = NULL;
+    no->pai = NULL;
+
+    // Encontrar pai
+    NO* pai = buscarPai(raiz, caminhoCompleto);
+    no->pai = pai;
+
+    inserirNo(raiz, pai, no);
+
     return 1;
 }
 
@@ -367,10 +580,121 @@ void help() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-// Funções Extras  ////////////////////////////////////////////////////////////
+// Terminal  /////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
 /*
+    Inicia o terminal:
+*/
+void terminal(Arvore* raiz) {
+    if (raiz == NULL) {
+        printf("Árvore não inicializada.\n");
+        exitPrograma(raiz);
+        return;
+    }
+    NO* atual = *raiz;
+    char linha[256];
+    char *comando, *arg;
+
+    printf("-------- Bem-vindo ao terminal! --------\n");
+    printf("Digite 'help' para ver os comandos disponíveis.\n");
+
+    int sair = 0;
+    while (sair == 0) {
+        // Prompt
+        if (atual != NULL && atual->caminho != NULL) {
+            printf("[%s] $ ", atual->caminho);
+        } else {
+            printf("[raiz] $ ");
+        }
+
+        // Lê a linha inteira
+        if (!fgets(linha, sizeof(linha), stdin)) {
+            // EOF ou erro de leitura
+            printf("\n");
+            continue;
+        }
+
+        // Remove o '\n' final, se presente
+        linha[strcspn(linha, "\n")] = '\0';
+
+        // Separa em tokens: comando e, opcionalmente, argumento
+        comando = strtok(linha, " \t");
+        arg = strtok(NULL, "\t");
+
+        if (comando == NULL) {
+            // Linha em branco: apenas repete o prompt
+            continue;
+        }
+
+        // Comandos
+        if (strcmp(comando, "cd") == 0) {
+            if (arg == NULL) {
+                printf("Uso: cd <diretório>\n");
+            } else {
+                atual = cd(atual, arg);
+            }
+        }
+        else if (strcmp(comando, "list") == 0) {
+            list(&atual);    // se ls não precisar de arg, você pode passar NULL
+        }
+        else if (strcmp(comando, "mkdir") == 0) {
+            if (arg == NULL) {
+                printf("Uso: mkdir <nome>\n");
+            } else {
+                mkdir(&atual, arg);
+            }
+        }
+        else if (strcmp(comando, "rm") == 0) {
+            if (arg == NULL) {
+                printf("Uso: rm <nome>\n");
+            } else {
+                rm(&atual, arg);
+            }
+        }
+        else if (strcmp(comando, "search") == 0) {
+            if (arg == NULL) {
+                printf("Uso: search <termo>\n");
+            } else {
+                if(search(&atual, arg) != NULL) {
+                    printf("Arquivo ou pasta encontrado: %s\n", search(&atual, arg));
+                } else {
+                    printf("Arquivo ou pasta não encontrado.\n");
+                }
+            }
+        }
+        else if (strcmp(comando, "help") == 0) {
+            help();
+        }
+        else if (strcmp(comando, "exit") == 0) {
+            liberarArvore(raiz); // Libera a memória da árvore antes de sair
+            exitPrograma(raiz);
+            break;
+        }
+        else {
+            printf("Comando '%s' não reconhecido. Digite 'help' para ver os disponíveis.\n", comando);
+        }
+    }
+
+    liberarArvore(raiz);
+    printf("Saindo do terminal.\n");
+}
+
+/*
+    Exibe o menu de ajuda.
+*/
+void help() {
+    printf("Comandos disponíveis:\n");
+    printf(" - cd <diretório> - Muda para o diretório especificado.\n");
+    printf(" - ls - Lista os arquivos e pastas no diretório atual.\n");
+    printf(" - mkdir <nome> - Cria um novo diretório.\n");
+    printf(" - rm <nome> - remove  um  pasta  e  seus  arquivos,  deve  fazer  uma  liberação recursiva.\n");
+    printf(" - search <nome> - busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”.\n");
+    printf(" - clear - Limpa a tela do terminal.\n");
+    printf(" - help - Exibe este menu de ajuda.\n");
+    printf(" - exit - Sai do terminal.\n");
+    printf("\n------------------------------------------\n");
+}/*
     Renomeia um arquivo ou diretório.
     Se o nome antigo não for encontrado, imprime uma mensagem de erro.
     Se o nome novo já existir, também imprime uma mensagem de erro.

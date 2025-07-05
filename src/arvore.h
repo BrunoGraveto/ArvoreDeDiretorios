@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #ifndef ARVORE_H
 #define ARVORE_H
 
@@ -10,15 +6,17 @@ typedef struct NO {
     char *caminho;
     char *nome;
     char *extensao;
-    NO *pai; // Pasta pai (nivel acima do atual)
-    NO *filho; // Arquivos no proximo nivel (em caso de pasta)
-    NO *irmao; // Arquivo ao lado do nó atual
+    struct NO *pai; // Pasta pai (nivel acima do atual)
+    struct NO *filho; // Arquivos no proximo nivel (em caso de pasta)
+    struct NO *irmao; // Arquivo ao lado do nó atual
 } NO;
 
 // Struct Arvore
 typedef struct NO* Arvore;
 
-// Funções internas
+/*
+    Funções Internas:
+*/  
 Arvore* criarArvore();
 int uploadArvore(Arvore* raiz, char* caminho);
 void removeRec (NO* no);//função auxiliar para remoção de pastas e arquivos
