@@ -32,40 +32,35 @@ int uploadArvore(Arvore* raiz, char* caminhoArquivo) {
 
     char linha[QTD_CARACTERES_LEITURA];
 
-    while (fscanf(arquivo, " %[^\n]", linha) == 1) { // Lembrar mudar (tentar tirar o 1)
-        linha[strcspn(linha, "\n")] = '\0';
-
-        if (strlen(linha) == 0)
-            continue;
-
-        // Fazer cópia do caminho porque strtok modifica a string
+    while (fscanf(arquivo, " %[^\n]", linha) == 1) {
         char caminho[QTD_CARACTERES_LEITURA];
         strcpy(caminho, linha);
 
-        char *barra = strtok(caminho, "/");
-        char caminhoCompleto[QTD_CARACTERES_LEITURA] = "";
+        char* parte = strtok(caminho, "/");
+        char caminhoParcial[QTD_CARACTERES_LEITURA] = "";
 
-        while (barra != NULL) {
-            if (strlen(caminhoCompleto) > 0)
-                strcat(caminhoCompleto, "/");
-            strcat(caminhoCompleto, barra);
+        while (parte != NULL) {
+            if (strlen(caminhoParcial) > 0)
+                strcat(caminhoParcial, "/");
+            strcat(caminhoParcial, parte);
 
-            // Verifica se já existe
-            if (search(raiz, caminhoCompleto) == NULL) {
-                if (strchr(barra, '.') != NULL) {
-                    mkarq(raiz, caminhoCompleto);
+            NO* encontrado = searchPorCaminho(raiz, caminhoParcial);
+            if (encontrado == NULL) {
+                if (strchr(parte, '.') != NULL) {
+                    mkarq(raiz, caminhoParcial);
                 } else {
-                    mkdir(raiz, caminhoCompleto);
+                    mkdir(raiz, caminhoParcial);
                 }
             }
 
-            barra = strtok(NULL, "/");
+            parte = strtok(NULL, "/");
         }
     }
 
     fclose(arquivo);
     return 1;
 }
+
 
 /*
     Função auxiliar para remoções recursivas, de um nó e toda sua sub-arvore:
@@ -209,31 +204,56 @@ Arvore cd(NO* atual, char* diretorio) {
 /*
     Busca um arquivo ou pasta pelo seu nome “arg” e informa a sua localização:
 */
+// char* search(Arvore* raiz, char* arg) {
+//     if (raiz == NULL || *raiz == NULL || arg == NULL) 
+//         return NULL;
+
+//     NO* atual = *raiz;
+//     NO* ult = NULL; // Último nó visitado
+
+//     while (atual != NULL) {
+//         if (atual->nome != NULL && strcmp(atual->nome, arg) == 0)
+//             return atual->caminho;
+    
+//         if (atual->filho != NULL && ult != atual->filho) {
+
+//             ult = atual;
+//             atual = atual->filho;
+
+//         } else if (atual->irmao != NULL && ult != atual->irmao) {
+
+//             ult = atual;
+//             atual = atual->irmao;
+
+//         } else {
+
+//             ult = atual;
+//             atual = atual->pai; // Volta para o pai se não tiver mais filhos ou irmãos
+//         }
+//     }
+
+//     return NULL;
+// }
 char* search(Arvore* raiz, char* arg) {
-    if (raiz == NULL || *raiz == NULL || arg == NULL) 
+    if (raiz == NULL || *raiz == NULL || arg == NULL)
         return NULL;
 
     NO* atual = *raiz;
-    NO* ult = NULL; // Último nó visitado
 
     while (atual != NULL) {
         if (atual->nome != NULL && strcmp(atual->nome, arg) == 0)
             return atual->caminho;
-    
-        if (atual->filho != NULL && ult != atual->filho) {
 
-            ult = atual;
+        if (atual->filho != NULL) {
             atual = atual->filho;
-
-        } else if (atual->irmao != NULL && ult != atual->irmao) {
-
-            ult = atual;
+        } else if (atual->irmao != NULL) {
             atual = atual->irmao;
-
         } else {
-
-            ult = atual;
-            atual = atual->pai; // Volta para o pai se não tiver mais filhos ou irmãos
+            // Volta até encontrar um nó com irmão não visitado
+            while (atual != NULL && atual->irmao == NULL)
+                atual = atual->pai;
+            if (atual != NULL)
+                atual = atual->irmao;
         }
     }
 
@@ -299,9 +319,26 @@ int rm(Arvore* raiz, char* diretorio) {
 /*
     Lista todos os componentes dentro da pasta atual:
 */
-int list(Arvore* raiz, char* diretorio) {
+int list(Arvore* raiz) {
+    if(raiz == NULL || *raiz == NULL) {
+        printf("a");
+        return 0;
+    }
+    char* diretorio = (*raiz)->nome ? (*raiz)->nome : "raiz"; // Se não tiver nome, assume raiz
 
-    return 0;
+    NO* atual = *raiz;
+
+    printf("\n%s/\n", diretorio);
+    NO* filho = atual->filho;
+    if (filho == NULL) {
+        printf("Diretório vazio.\n");
+    }
+    while (filho != NULL) {
+        printf("    %s\n", filho->nome);
+        filho = filho->irmao;
+    }
+    printf("\n");
+    return 1;
 }
 
 /*
@@ -410,7 +447,6 @@ void terminal(Arvore* raiz) {
     int sair = 0;
     while (sair == 0) {
         // Prompt
-        system("cls");
         if (atual != NULL && atual->caminho != NULL) {
             printf("[%s] $ ", atual->caminho);
         } else {
@@ -445,7 +481,7 @@ void terminal(Arvore* raiz) {
             }
         }
         else if (strcmp(comando, "list") == 0) {
-            // list(atual, arg);    // se ls não precisar de arg, você pode passar NULL
+            list(&atual);    // se ls não precisar de arg, você pode passar NULL
         }
         else if (strcmp(comando, "mkdir") == 0) {
             if (arg == NULL) {
@@ -483,7 +519,6 @@ void terminal(Arvore* raiz) {
         else {
             printf("Comando '%s' não reconhecido. Digite 'help' para ver os disponíveis.\n", comando);
         }
-        system("pause");
     }
 
     liberarArvore(raiz);

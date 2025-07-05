@@ -30,7 +30,7 @@ void inserirNo(Arvore* raiz, NO* pai, NO* novoNo);
 Arvore cd(NO* atual, char* diretorio);
 char* search(Arvore* raiz, char* arg);
 int rm(Arvore* raiz, char* diretorio);
-int list(Arvore* raiz, char* diretorio);
+int list(Arvore* raiz);
 int mkdir(Arvore* raiz, char* caminhoCompleto);
 int exitPrograma(Arvore* raiz);
 
