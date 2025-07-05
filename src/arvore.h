@@ -40,5 +40,6 @@ int echo(char* mensagem); //Exibe a mensagem especificada
 
 
 
+int listAll(Arvore* raiz, char* diretorio);
 
 #endif
