@@ -58,7 +58,7 @@ void removeRec (NO* no){
     informar que existe um diretório “Meus Documentos” e “Meus Downloads”
     senão existe alternativas então imprimi “Diretório não encontrado”
 */
-Arvore cd(Arvore atual, char* diretorio) {
+Arvore cd(NO* atual, char* diretorio) {
     if (atual == NULL || diretorio == NULL) {
         printf("Diretório não encontrado.\n");
         return NULL;
@@ -72,7 +72,7 @@ Arvore cd(Arvore atual, char* diretorio) {
     if (strcmp(diretorio, "..") == 0) {
         return atual->pai ? atual->pai : atual;
     }
-    Arvore filho = atual->filho;
+    NO* filho = atual->filho;
     while(filho != NULL){
         // Verifica se o nome do nó atual é igual ao diretório
         if (filho->nome != NULL && strcmp(filho->nome, diretorio) == 0) {
@@ -222,8 +222,6 @@ int exit(Arvore* raiz) {
     return 1;
 }
 
-
-
 /*
     Função que inicia o loop terminal, deve ser chamada no main.
     comando\0arg\0
@@ -233,13 +231,13 @@ void terminal(Arvore* raiz) {
         printf("Árvore não inicializada.\n");
         exit(1);
     }
-    Arvore atual = raiz;
+    NO* atual = *raiz;
     char linha[256];
     char *comando, *arg;
 
     printf("-------- Bem-vindo ao terminal! --------\n");
     printf("Digite 'help' para ver os comandos disponíveis.\n");
-
+    
     while (1) {
         // Prompt
         printf("[%s] $ ", atual->caminho ? atual->caminho : "raiz");
@@ -248,7 +246,7 @@ void terminal(Arvore* raiz) {
         if (!fgets(linha, sizeof(linha), stdin)) {
             // EOF ou erro de leitura
             printf("\n");
-            break;
+            continue;
         }
 
         // Remove o '\n' final, se presente
@@ -282,22 +280,22 @@ void terminal(Arvore* raiz) {
             if (arg == NULL) {
                 printf("Uso: mkdir <nome>\n");
             } else {
-                mkdir(atual, arg);
+                mkdir(&atual, arg);
             }
         }
         else if (strcmp(comando, "rm") == 0) {
             if (arg == NULL) {
                 printf("Uso: rm <nome>\n");
             } else {
-                rm(atual, arg);
+                rm(&atual, arg);
             }
         }
         else if (strcmp(comando, "search") == 0) {
             if (arg == NULL) {
                 printf("Uso: search <termo>\n");
             } else {
-                if(search(atual, arg) != NULL) {
-                    printf("Arquivo ou pasta encontrado: %s\n", search(atual, arg));
+                if(search(&atual, arg) != NULL) {
+                    printf("Arquivo ou pasta encontrado: %s\n", search(&atual, arg));
                 } else {
                     printf("Arquivo ou pasta não encontrado.\n");
                 }
@@ -316,8 +314,6 @@ void terminal(Arvore* raiz) {
             printf("Comando '%s' não reconhecido. Digite 'help' para ver os disponíveis.\n", comando);
         }
     }
-
-    printf("Saindo do terminal.\n");
 }
 
 /*
