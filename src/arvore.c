@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "arvore.h"
 
+#define QTD_CARACTERES_LEITURA 300
+
 //////////////////////////////////////////////////////////////////////////////////
 // Funções Internas //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
@@ -19,8 +21,18 @@ Arvore* criarArvore() {
 /*
     Lê varios arquivos de um txt e coloca na arvore e insere
 */
-int uploadArquivos(Arvore* raiz, char* caminho) {
+int uploadArvore(Arvore* raiz, char* caminho) {
+    if (raiz == NULL) // Lembrar de ver para adicionar verificação de *raiz
+        return 0;
+    FILE *arquivo = fopen("exemplo.txt", "r");
+    if (arquivo == NULL) 
+        return 0;
+    char linha[QTD_CARACTERES_LEITURA];
+    while (fscanf(arquivo, "%[^\n]", linha) != EOF) {
 
+    }
+    fclose(arquivo);
+    return 1;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -71,5 +83,3 @@ int mkdir(Arvore* raiz, char* arg) {
     
     return 1;
 }
-
-

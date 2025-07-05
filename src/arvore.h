@@ -16,7 +16,7 @@ typedef struct NO* Arvore;
 
 // Funções internas
 Arvore* criarArvore();
-int uploadArquivos(Arvore* raiz, char* caminho);
+int uploadArvore(Arvore* raiz, char* caminho);
 
 // Funções de usuário
 int cd(Arvore* raiz, char* diretorio);
