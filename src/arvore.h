@@ -27,7 +27,7 @@ void removeRec (NO* no);//função auxiliar para remoção de pastas e arquivos
 Arvore cd(Arvore raiz, char* diretorio);
 char* search(Arvore* raiz, char* arg); //busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”  e  informa  a sua localização
 int rm(Arvore* raiz, char* diretorio); //Remove uma pasta e seus arquivos
-int list(Arvore* raiz, char* diretorio);
+int list(Arvore* raiz);
 int mkdir(Arvore* raiz, char* arg);
 void terminal(Arvore* raiz); //Função que inicia o loop terminal
 void help(); //Exibe o menu de ajuda

@@ -178,45 +178,28 @@ int rm(Arvore* raiz, char* diretorio) {
 /*
     Lista todos os componentes dentro da pasta atual.
 */
-int list(Arvore* raiz, char* diretorio) {
-    if(raiz == NULL || *raiz == NULL || diretorio == NULL){
+int list(Arvore* raiz) {
+    if(raiz == NULL || *raiz == NULL) {
+        return 0;
+    }
+    char* diretorio = (*raiz)->nome ? (*raiz)->nome : "raiz"; // Se não tiver nome, assume raiz
+    if (diretorio == NULL) {
+        printf("Diretório não encontrado.\n");
         return 0;
     }
 
     NO* atual = *raiz;
-    NO* ult = NULL;
 
-    while(atual != NULL){
-        if(strcmp(atual->nome, diretorio) == 0){
-            NO* comp = atual->filho;
-
-            if(comp == NULL){
-                printf("vazio\n");
-                return 1;
-            }
-
-            printf("\nArquivos da Pasta %s\n", diretorio);
-            while(comp != NULL){
-                printf("- %s\n", comp->nome);
-                comp = comp->irmao;
-            }
-            return 1;
-        }
-
-        if (atual->filho != NULL && ult != atual->filho) {
-            ult = atual;
-            atual = atual->filho;
-
-        } else if (atual->irmao != NULL && ult != atual->irmao) {
-            ult = atual;
-            atual = atual->irmao;
-
-        } else {
-            ult = atual;
-            atual = atual->pai;
-        }
+    printf("Conteúdo do diretório '%s':\n", diretorio);
+    NO* filho = atual->filho;
+    if (filho == NULL) {
+        printf("Diretório vazio.\n");
     }
-    return 0;
+    while (filho != NULL) {
+        printf("- %s\n", filho->nome);
+        filho = filho->irmao;
+    }
+    return 1;
 }
 
 /*
@@ -310,7 +293,7 @@ void terminal(Arvore* raiz) {
             }
         }
         else if (strcmp(comando, "ls") == 0) {
-            list(atual, arg);    // se ls não precisar de arg, você pode passar NULL
+            list(&atual);
         }
         else if (strcmp(comando, "mkdir") == 0) {
             if (arg == NULL) {
