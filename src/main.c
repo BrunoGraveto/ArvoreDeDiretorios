@@ -1,15 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "arvore.h"
 
 int main() {
     
     Arvore *raiz = criarArvore();
-    if (arvore == NULL) {
-        printf("Erro ao criar a árvore.\n");
-        return 1;
-    }
-    terminal(arvore);    NO* noRaiz = (NO*) malloc(sizeof(NO));
+    NO* noRaiz = (NO*) malloc(sizeof(NO));
     noRaiz->nome = strdup("raiz");
     noRaiz->caminho = strdup("raiz");
     noRaiz->extensao = NULL;   

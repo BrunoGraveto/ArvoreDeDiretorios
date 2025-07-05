@@ -9,3 +9,4 @@ raiz/Meus Documentos/fontes/main.h
 raiz/Meus Documentos/imagens
 raiz/Meus Downloads/7zip.exe
 raiz/Meus Downloads/t2.rar
+raiz/aa/aaa.rar

@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "arvore.h"
 
 #define QTD_CARACTERES_LEITURA 300
@@ -49,7 +46,7 @@ int uploadArvore(Arvore* raiz, char* caminhoArquivo) {
                 if (strchr(parte, '.') != NULL) {
                     mkarq(raiz, caminhoParcial);
                 } else {
-                    mkdir(raiz, caminhoParcial);
+                    mkdir_(raiz, caminhoParcial);
                 }
             }
 
@@ -66,17 +63,17 @@ int uploadArvore(Arvore* raiz, char* caminhoArquivo) {
     Função auxiliar para remoções recursivas, de um nó e toda sua sub-arvore:
 */
 void removeRec(NO* no) {
-    if(no == NULL) return;
-
+    if (!no) return;
+    // Primeiro libera toda a sub-árvore de filhos
     removeRec(no->filho);
+    // Depois libera os irmãos daquele ramo
     removeRec(no->irmao);
-
+    // Por fim, libera os campos alocados e o próprio nó
     free(no->caminho);
     free(no->nome);
     free(no->extensao);
     free(no);
 }
-
 /*
     Verifica se existe um arquivo por um caminho completo:
 */
@@ -176,7 +173,7 @@ void liberarArvore(Arvore* raiz) {
 */
 NO* cd(NO* atual, char* diretorio) {
     if (atual == NULL || diretorio == NULL) {
-        printf("Diretório não encontrado.\n");
+        printf("Diretorio nao encontrado.\n");
         return NULL;
     }
 
@@ -187,49 +184,19 @@ NO* cd(NO* atual, char* diretorio) {
     NO* filho = atual->filho;
     while(filho != NULL){
         // Verifica se o nome do nó atual é igual ao diretório
-        if (filho->nome != NULL && strcmp(filho->nome, diretorio) == 0 && filho->extensao != NULL) {
+        if (filho->nome != NULL && strcmp(filho->nome, diretorio) == 0 && filho->extensao == NULL) {
             return filho; // Retorna o nó atual se for o diretório desejado
         }
 
         filho = filho->irmao; // Muda para o irmão
     }
-
+    printf("Diretorio nao encontrado\n");
     return atual;
 }
 
 /*
     Busca um arquivo ou pasta pelo seu nome “arg” e informa a sua localização:
 */
-// char* search(Arvore* raiz, char* arg) {
-//     if (raiz == NULL || *raiz == NULL || arg == NULL) 
-//         return NULL;
-
-//     NO* atual = *raiz;
-//     NO* ult = NULL; // Último nó visitado
-
-//     while (atual != NULL) {
-//         if (atual->nome != NULL && strcmp(atual->nome, arg) == 0)
-//             return atual->caminho;
-    
-//         if (atual->filho != NULL && ult != atual->filho) {
-
-//             ult = atual;
-//             atual = atual->filho;
-
-//         } else if (atual->irmao != NULL && ult != atual->irmao) {
-
-//             ult = atual;
-//             atual = atual->irmao;
-
-//         } else {
-
-//             ult = atual;
-//             atual = atual->pai; // Volta para o pai se não tiver mais filhos ou irmãos
-//         }
-//     }
-
-//     return NULL;
-// }
 char* search(Arvore* raiz, char* arg) {
     if (raiz == NULL || *raiz == NULL || arg == NULL)
         return NULL;
@@ -260,56 +227,27 @@ char* search(Arvore* raiz, char* arg) {
     Remove um pasta e seus arquivos, deve fazer uma liberação recursiva:
 */
 int rm(Arvore* raiz, char* diretorio) {
-    if (raiz == NULL || *raiz == NULL || diretorio == NULL) 
+    if (raiz == NULL || *raiz == NULL || diretorio == NULL)
         return 0;
 
-    NO* atual = *raiz;
-    NO* ult = NULL;
+    // ponteiro para o ponteiro do primeiro filho
+    NO** ptr = &((*raiz)->filho);
 
-    while (atual != NULL) {
-        if (strcmp(atual->nome, diretorio) == 0) {
-            
-            if (atual->pai == NULL) { 
-                *raiz = atual->irmao;
-
-            } else {
-
-                if (atual->pai->filho == atual) {
-                    atual->pai->filho = atual->irmao;
-
-                } else {
-
-                    NO* irmaoAnt = atual->pai->filho;
-                    while (irmaoAnt != NULL && irmaoAnt->irmao != atual) {
-                        irmaoAnt = irmaoAnt->irmao;
-                    }
-                    if (irmaoAnt != NULL) {
-                        irmaoAnt->irmao = atual->irmao;
-                    }
-                }
-            }
-            
-            atual->irmao = NULL; 
-            removeRec(atual);
-            
+    // itera sobre a lista de filhos
+    while (*ptr) {
+        NO* filho = *ptr;
+        if (filho->nome && strcmp(filho->nome, diretorio) == 0) {
+            // desconecta o nó
+            *ptr = filho->irmao;
+            filho->irmao = NULL;
+            // libera todo o ramo
+            removeRec(filho);
             return 1;
         }
-
-        if (atual->filho != NULL && ult != atual->filho) {
-            ult = atual;
-            atual = atual->filho;
-
-        } else if (atual->irmao != NULL && ult != atual->irmao) {
-            ult = atual;
-            atual = atual->irmao;
-
-        } else {
-            ult = atual;
-            atual = atual->pai;
-        }
+        // avança para o próximo irmão
+        ptr = &(filho->irmao);
     }
-
-    return 0; // Não encontrou
+    return 0;
 }
 
 /*
@@ -327,7 +265,7 @@ int list(Arvore* raiz) {
     printf("\n%s/\n", diretorio);
     NO* filho = atual->filho;
     if (filho == NULL) {
-        printf("Diretório vazio.\n");
+        printf("Diretorio vazio.\n");
     }
     while (filho != NULL) {
         printf("    %s\n", filho->nome);
@@ -340,7 +278,7 @@ int list(Arvore* raiz) {
 /*
     Cria uma pasta com o nome “arg” na pasta atual:
 */
-int mkdir(Arvore* raiz, char* caminhoCompleto) {
+int mkdir_(Arvore* raiz, char* caminhoCompleto) {
     if (raiz == NULL || caminhoCompleto == NULL)
         return 0;
 
@@ -373,10 +311,6 @@ int mkdir(Arvore* raiz, char* caminhoCompleto) {
     Sair do Programa e liberar a Árvore:
 */
 int exitPrograma(Arvore* raiz) {
-    if (raiz == NULL || *raiz == NULL) {
-        printf("Árvore não inicializada.\n");
-        return 0;
-    }
     liberarArvore(raiz);
     return 1;
 }
@@ -434,146 +368,20 @@ int clear() {
     return 1;
 }
 
-
-/*
-    Sai do terminal e libera a memória da árvore.
-*/
-int exit(Arvore* raiz) {
-    if (raiz == NULL || *raiz == NULL) {
-        printf("Árvore não inicializada.\n");
-        return 0;
-    }
-    liberarArvore(raiz);
-    return 1;
-}
-
-/*
-    Função que inicia o loop terminal, deve ser chamada no main.
-    comando\0arg\0
-*/
-void terminal(Arvore* raiz) {
-    if (raiz == NULL) {
-        printf("Árvore não inicializada.\n");
-        exit(1);
-    }
-    NO* atual = *raiz;
-    char linha[256];
-    char *comando, *arg;
-
-    printf("-------- Bem-vindo ao terminal! --------\n");
-    printf("Digite 'help' para ver os comandos disponíveis.\n");
-    
-    while (1) {
-        // Prompt
-        printf("[%s] $ ", atual->caminho ? atual->caminho : "raiz");
-
-        // Lê a linha inteira
-        if (!fgets(linha, sizeof(linha), stdin)) {
-            // EOF ou erro de leitura
-            printf("\n");
-            continue;
-        }
-
-        // Remove o '\n' final, se presente
-        linha[strcspn(linha, "\n")] = '\0';
-
-        // Separa em tokens: comando e, opcionalmente, argumento
-        comando = strtok(linha, " \t");
-        arg     = strtok(NULL,  " \t");
-
-        if (comando == NULL) {
-            // Linha em branco: apenas repete o prompt
-            continue;
-        }
-
-        // Comandos
-        if (strcmp(comando, "cd") == 0) {
-            if (arg == NULL) {
-                printf("Uso: cd <diretório>\n");
-            } else {
-                if ((atual = cd(atual, arg)) == NULL) {
-                    printf("Diretório '%s' não encontrado.\n", arg);
-                } else {
-                    printf("Mudando para o diretório: %s\n", atual->caminho ? atual->caminho : "raiz");
-                }
-            }
-        }
-        else if (strcmp(comando, "ls") == 0) {
-            list(&atual);
-        }
-        else if (strcmp(comando, "mkdir") == 0) {
-            if (arg == NULL) {
-                printf("Uso: mkdir <nome>\n");
-            } else {
-                mkdir(&atual, arg);
-            }
-        }
-        else if (strcmp(comando, "rm") == 0) {
-            if (arg == NULL) {
-                printf("Uso: rm <nome>\n");
-            } else {
-                rm(&atual, arg);
-            }
-        }
-        else if (strcmp(comando, "search") == 0) {
-            if (arg == NULL) {
-                printf("Uso: search <termo>\n");
-            } else {
-                if(search(&atual, arg) != NULL) {
-                    printf("Arquivo ou pasta encontrado: %s\n", search(&atual, arg));
-                } else {
-                    printf("Arquivo ou pasta não encontrado.\n");
-                }
-            }
-        }
-        else if (strcmp(comando, "help") == 0) {
-            help();
-        }
-        else if (strcmp(comando, "clear") == 0) {
-            clear(); // Limpa a tela do terminal
-        }
-        else if (strcmp(comando, "echo") == 0) {
-            if (arg == NULL) {
-                printf("Uso: echo <mensagem>\n");
-            } else {
-                echo(arg);
-            }
-        }
-        else if (strcmp(comando, "rename") == 0) {
-            if (arg == NULL) {
-                printf("Uso: rename <nome_antigo> <nome_novo>\n");
-            } else {
-                char* novo_nome = strtok(NULL, " \t");
-                if (novo_nome == NULL) {
-                    printf("Uso: rename <nome_antigo> <nome_novo>\n");
-                } else {
-                    rename(&atual, arg, novo_nome);
-                }
-            }
-        }
-        else if (strcmp(comando, "exit") == 0) {
-            exit(raiz);
-        }
-        else {
-            printf("Comando '%s' não reconhecido. Digite 'help' para ver os disponíveis.\n", comando);
-        }
-    }
-}
-
 /*
     Exibe o menu de ajuda.
 */
 void help() {
-    printf("Comandos disponíveis:\n");
-    printf(" - cd <diretório> - Muda para o diretório especificado.\n");
-    printf(" - ls - Lista os arquivos e pastas no diretório atual.\n");
-    printf(" - mkdir <nome> - Cria um novo diretório.\n");
-    printf(" - rm <nome> - remove  um  pasta  e  seus  arquivos,  deve  fazer  uma  liberação recursiva.\n");
-    printf(" - search <nome> - busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”.\n");
+    printf("Comandos disponiveis:\n");
+    printf(" - cd <diretorio> - Muda para o diretorio especificado.\n");
+    printf(" - list - Lista os arquivos e pastas no diretorio atual.\n");
+    printf(" - mkdir <nome> - Cria um novo diretorio.\n");
+    printf(" - rm <nome> - remove  um  pasta  e  seus  arquivos,  deve  fazer  uma  liberacao recursiva.\n");
+    printf(" - search <nome> - busca  um  arquivo  ou  pasta  pelo  seu  nome.\n");
     printf(" - clear - Limpa a tela do terminal.\n");
     printf(" - help - Exibe este menu de ajuda.\n");
     printf(" - echo <mensagem> - Exibe a mensagem especificada.\n");
-    printf(" - rename <nome_antigo> <nome_novo> - Renomeia um arquivo ou diretório.\n");
+    printf(" - rename <nome_antigo> <nome_novo> - Renomeia um arquivo ou diretorio.\n");
     printf(" - exit - Sai do terminal.\n");
     printf("\n------------------------------------------\n");
     
@@ -588,7 +396,7 @@ void help() {
 */
 void terminal(Arvore* raiz) {
     if (raiz == NULL) {
-        printf("Árvore não inicializada.\n");
+        printf("Árvore nao inicializada.\n");
         exitPrograma(raiz);
         return;
     }
@@ -597,7 +405,7 @@ void terminal(Arvore* raiz) {
     char *comando, *arg;
 
     printf("-------- Bem-vindo ao terminal! --------\n");
-    printf("Digite 'help' para ver os comandos disponíveis.\n");
+    printf("Digite 'help' para ver os comandos disponiveis.\n");
 
     int sair = 0;
     while (sair == 0) {
@@ -621,6 +429,7 @@ void terminal(Arvore* raiz) {
         // Separa em tokens: comando e, opcionalmente, argumento
         comando = strtok(linha, " \t");
         arg = strtok(NULL, "\t");
+        
 
         if (comando == NULL) {
             // Linha em branco: apenas repete o prompt
@@ -630,7 +439,7 @@ void terminal(Arvore* raiz) {
         // Comandos
         if (strcmp(comando, "cd") == 0) {
             if (arg == NULL) {
-                printf("Uso: cd <diretório>\n");
+                printf("Uso: cd <diretorio>\n");
             } else {
                 atual = cd(atual, arg);
             }
@@ -642,14 +451,18 @@ void terminal(Arvore* raiz) {
             if (arg == NULL) {
                 printf("Uso: mkdir <nome>\n");
             } else {
-                mkdir(&atual, arg);
+                mkdir_(&atual, arg);
             }
         }
         else if (strcmp(comando, "rm") == 0) {
             if (arg == NULL) {
                 printf("Uso: rm <nome>\n");
             } else {
-                rm(&atual, arg);
+                if(rm(&atual, arg)) {
+                    printf("Pasta ou arquivo '%s' removido com sucesso.\n", arg);
+                } else {
+                    printf("Pasta ou arquivo '%s' não encontrado.\n", arg);
+                }
             }
         }
         else if (strcmp(comando, "search") == 0) {
@@ -659,55 +472,58 @@ void terminal(Arvore* raiz) {
                 if(search(&atual, arg) != NULL) {
                     printf("Arquivo ou pasta encontrado: %s\n", search(&atual, arg));
                 } else {
-                    printf("Arquivo ou pasta não encontrado.\n");
+                    printf("Arquivo ou pasta nao encontrado.\n");
                 }
             }
         }
         else if (strcmp(comando, "help") == 0) {
             help();
         }
+        else if (strcmp(comando, "echo") == 0) {
+            if (arg == NULL) {
+                printf("Uso: echo <mensagem>\n");
+            } else {
+                echo(arg);
+            }
+        }
+        else if (strcmp(comando, "rename") == 0) {
+            if (arg == NULL) {
+                printf("Uso: rename <nome_antigo> <nome_novo>\n");
+            } else {
+                char* nome_antigo = arg;
+                char* nome_novo = strtok(NULL, "\t");
+                if (nome_novo == NULL) {
+                    printf("Uso: rename <nome_antigo> <nome_novo>\n");
+                } else {
+                    rename_nome(raiz, nome_antigo, nome_novo);
+                }
+            }
+        }
+        else if (strcmp(comando, "clear") == 0) {
+            clear();
+        }
         else if (strcmp(comando, "exit") == 0) {
-            liberarArvore(raiz); // Libera a memória da árvore antes de sair
             exitPrograma(raiz);
             break;
         }
         else {
-            printf("Comando '%s' não reconhecido. Digite 'help' para ver os disponíveis.\n", comando);
+            printf("Comando '%s' nao reconhecido. Digite 'help' para ver os disponiveis.\n", comando);
         }
     }
 
-    liberarArvore(raiz);
     printf("Saindo do terminal.\n");
 }
 
-/*
-    Exibe o menu de ajuda.
-*/
-void help() {
-    printf("Comandos disponíveis:\n");
-    printf(" - cd <diretório> - Muda para o diretório especificado.\n");
-    printf(" - ls - Lista os arquivos e pastas no diretório atual.\n");
-    printf(" - mkdir <nome> - Cria um novo diretório.\n");
-    printf(" - rm <nome> - remove  um  pasta  e  seus  arquivos,  deve  fazer  uma  liberação recursiva.\n");
-    printf(" - search <nome> - busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”.\n");
-    printf(" - clear - Limpa a tela do terminal.\n");
-    printf(" - help - Exibe este menu de ajuda.\n");
-    printf(" - exit - Sai do terminal.\n");
-    printf("\n------------------------------------------\n");
-}/*
-    Renomeia um arquivo ou diretório.
-    Se o nome antigo não for encontrado, imprime uma mensagem de erro.
-    Se o nome novo já existir, também imprime uma mensagem de erro.
-*/
-int rename(Arvore* raiz, char* nome_antigo, char* nome_novo) {
+
+int rename_nome(Arvore* raiz, char* nome_antigo, char* nome_novo) {
     if (raiz == NULL || *raiz == NULL || nome_antigo == NULL || nome_novo == NULL) {
-        printf("Árvore não inicializada ou nomes inválidos.\n");
+        printf("Arvore nao inicializada ou nomes invalidos.\n");
         return 0;
     }
 
     NO* atual = (*raiz)->filho; // Começa do primeiro filho da raiz
     if (atual == NULL) {
-        printf("Árvore vazia.\n");
+        printf("Arvore vazia.\n");
         return 0;
     }
     while (atual != NULL) {
@@ -719,7 +535,7 @@ int rename(Arvore* raiz, char* nome_antigo, char* nome_novo) {
         }
         atual = atual->irmao; // Verifica o próximo irmão
     }
-    printf("Arquivo ou pasta '%s' não encontrado.\n", nome_antigo);
+    printf("Arquivo ou pasta '%s' nao encontrado.\n", nome_antigo);
     return 0;
 }
 
@@ -730,7 +546,7 @@ int rename(Arvore* raiz, char* nome_antigo, char* nome_novo) {
 
 int echo(char* mensagem) {
     if (mensagem == NULL) {
-        printf("Mensagem inválida.\n");
+        printf("Mensagem invalida.\n");
         return 0;
     }
     printf("%s\n", mensagem);
