@@ -58,32 +58,27 @@ void removeRec (NO* no){
     informar que existe um diretório “Meus Documentos” e “Meus Downloads”
     senão existe alternativas então imprimi “Diretório não encontrado”
 */
-Arvore cd(NO* atual, char* diretorio) {
+NO* cd(NO* atual, char* diretorio) {
     if (atual == NULL || diretorio == NULL) {
         printf("Diretório não encontrado.\n");
         return NULL;
     }
 
     // Caso "." → permanece
-    if (strcmp(diretorio, ".") == 0) {
-        return atual;
-    }
-
-    if (strcmp(diretorio, "..") == 0) {
-        return atual->pai ? atual->pai : atual;
-    }
+    if (strcmp(diretorio, ".") == 0) return atual;
+    if (strcmp(diretorio, "..") == 0) return atual->pai ? atual->pai : atual;
+    
     NO* filho = atual->filho;
     while(filho != NULL){
         // Verifica se o nome do nó atual é igual ao diretório
-        if (filho->nome != NULL && strcmp(filho->nome, diretorio) == 0 && filho->extensao == NULL) {
+        if (filho->nome != NULL && strcmp(filho->nome, diretorio) == 0 && filho->extensao != NULL) {
             return filho; // Retorna o nó atual se for o diretório desejado
         }
 
         filho = filho->irmao; // Muda para o irmão
     }
-    // Se não encontrou, verifica se há sugestões
-    printf("Diretório não encontrado.\n");
-    return NULL;
+
+    return atual;
 }
 
 /*
