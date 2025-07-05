@@ -31,19 +31,31 @@ int uploadArquivos(Arvore* raiz, char* caminho) {
     informar que existe um diretório “Meus Documentos” e “Meus Downloads”
     senão existe alternativas então imprimi “Diretório não encontrado”
 */
-int cd(Arvore atual, char* diretorio) {
+Arvore cd(Arvore atual, char* diretorio) {
     if (atual == NULL || diretorio == NULL) {
         printf("Diretório não encontrado.\n");
-        return 0;
+        return NULL;
     }
 
-    if (strcmp(diretorio, "..") == 0 || strcmp(diretorio, ".") == 0 || strcmp(diretorio, atual->pai->nome) == 0) {
+    // Caso "." → permanece
+    if (strcmp(diretorio, ".") == 0) {
+        return atual;
+    }
+
+    if (strcmp(diretorio, "..") == 0) {
         return atual->pai ? atual->pai : atual;
     }
+    Arvore filho = atual->filho;
+    while(filho != NULL){
+        // Verifica se o nome do nó atual é igual ao diretório
+        if (filho->nome != NULL && strcmp(filho->nome, diretorio) == 0) {
+            return filho; // Retorna o nó atual se for o diretório desejado
+        }
 
-    
+        filho = filho->irmao; // Muda para o irmão
+    }
 
-    return 0;
+    return NULL;
 }
 
 /*
@@ -83,6 +95,7 @@ char* search(Arvore* raiz, char* arg) {
     Remove um pasta e seus arquivos, deve fazer uma liberação recursiva.
 */
 int rm(Arvore* raiz, char* diretorio) {
+
     return 0;
 }   
 
@@ -107,6 +120,23 @@ int mkdir(Arvore* raiz, char* arg) {
     return 1;
 }
 
+/*
+    Limpa a tela do terminal.
+    Dependendo do sistema operacional, usa "cls" ou "clear".
+*/
+int clear() {
+    // Limpa a tela do terminal
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
+    return 1;
+}
+
+/*
+    Sai do terminal e libera a memória da árvore.
+*/
 int exit(Arvore* raiz) {
     if (raiz == NULL || *raiz == NULL) {
         printf("Árvore não inicializada.\n");
@@ -115,6 +145,8 @@ int exit(Arvore* raiz) {
     liberarArvore(raiz);
     return 1;
 }
+
+
 
 /*
     Função que inicia o loop terminal, deve ser chamada no main.
@@ -160,11 +192,15 @@ void terminal(Arvore* raiz) {
             if (arg == NULL) {
                 printf("Uso: cd <diretório>\n");
             } else {
-                cd(&atual, arg);  // supondo que cd atualize o ponteiro 'atual'
+                if ((atual = cd(atual, arg)) == NULL) {
+                    printf("Diretório '%s' não encontrado.\n", arg);
+                } else {
+                    printf("Mudando para o diretório: %s\n", atual->caminho ? atual->caminho : "raiz");
+                }
             }
         }
         else if (strcmp(comando, "ls") == 0) {
-            ls(atual, arg);    // se ls não precisar de arg, você pode passar NULL
+            list(atual, arg);    // se ls não precisar de arg, você pode passar NULL
         }
         else if (strcmp(comando, "mkdir") == 0) {
             if (arg == NULL) {
@@ -194,9 +230,11 @@ void terminal(Arvore* raiz) {
         else if (strcmp(comando, "help") == 0) {
             help();
         }
+        else if (strcmp(comando, "clear") == 0) {
+            clear(); // Limpa a tela do terminal
+        }
         else if (strcmp(comando, "exit") == 0) {
-            liberarArvore(raiz); // Libera a memória da árvore antes de sair
-            exit(0);
+            exit(raiz);
         }
         else {
             printf("Comando '%s' não reconhecido. Digite 'help' para ver os disponíveis.\n", comando);
@@ -209,7 +247,6 @@ void terminal(Arvore* raiz) {
 /*
     Exibe o menu de ajuda.
 */
-
 void help() {
     printf("Comandos disponíveis:\n");
     printf(" - cd <diretório> - Muda para o diretório especificado.\n");

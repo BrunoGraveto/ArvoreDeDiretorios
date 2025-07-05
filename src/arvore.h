@@ -23,7 +23,7 @@ Arvore* criarArvore();
 int uploadArquivos(Arvore* raiz, char* caminho);
 
 // Funções de usuário
-int cd(Arvore raiz, char* diretorio);
+Arvore cd(Arvore raiz, char* diretorio);
 char* search(Arvore* raiz, char* arg); //busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”  e  informa  a sua localização
 int rm(Arvore* raiz, char* diretorio); //Remove uma pasta e seus arquivos
 int list(Arvore* raiz, char* diretorio);
