@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #ifndef ARVORE_H
 #define ARVORE_H
 
@@ -24,5 +28,8 @@ char* search(Arvore* raiz, char* arg);
 int rm(Arvore* raiz, char* diretorio);
 int list(Arvore* raiz, char* diretorio);
 int mkdir(Arvore* raiz, char* arg);
+
+//Funções Extras
+void removeRec (NO* no);
 
 #endif
