@@ -31,8 +31,14 @@ int list(Arvore* raiz);
 int mkdir(Arvore* raiz, char* arg);
 void terminal(Arvore* raiz); //Função que inicia o loop terminal
 void help(); //Exibe o menu de ajuda
+int clear(); //Limpa a tela do terminal
 void liberarArvore(Arvore* raiz); //Libera a memória alocada para a árvore
 
 //Funções Extras
+int rename(Arvore* raiz, char* nome_antigo, char* nome_novo); //Renomeia um arquivo ou diretório
+int echo(char* mensagem); //Exibe a mensagem especificada
+
+
+
 
 #endif

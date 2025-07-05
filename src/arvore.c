@@ -230,6 +230,7 @@ int clear() {
     return 1;
 }
 
+
 /*
     Sai do terminal e libera a memória da árvore.
 */
@@ -327,6 +328,25 @@ void terminal(Arvore* raiz) {
         else if (strcmp(comando, "clear") == 0) {
             clear(); // Limpa a tela do terminal
         }
+        else if (strcmp(comando, "echo") == 0) {
+            if (arg == NULL) {
+                printf("Uso: echo <mensagem>\n");
+            } else {
+                echo(arg);
+            }
+        }
+        else if (strcmp(comando, "rename") == 0) {
+            if (arg == NULL) {
+                printf("Uso: rename <nome_antigo> <nome_novo>\n");
+            } else {
+                char* novo_nome = strtok(NULL, " \t");
+                if (novo_nome == NULL) {
+                    printf("Uso: rename <nome_antigo> <nome_novo>\n");
+                } else {
+                    rename(&atual, arg, novo_nome);
+                }
+            }
+        }
         else if (strcmp(comando, "exit") == 0) {
             exit(raiz);
         }
@@ -359,3 +379,35 @@ void help() {
 // Funções Extras  ////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
+int rename(Arvore* raiz, char* nome_antigo, char* nome_novo) {
+    if (raiz == NULL || *raiz == NULL || nome_antigo == NULL || nome_novo == NULL) {
+        printf("Árvore não inicializada ou nomes inválidos.\n");
+        return 0;
+    }
+
+    NO* atual = (*raiz)->filho; // Começa do primeiro filho da raiz
+    if (atual == NULL) {
+        printf("Árvore vazia.\n");
+        return 0;
+    }
+    while (atual != NULL) {
+        if (atual->nome != NULL && strcmp(atual->nome, nome_antigo) == 0) {
+            free(atual->nome);
+            atual->nome = strdup(nome_novo);
+            printf("Renomeado '%s' para '%s'.\n", nome_antigo, nome_novo);
+            return 1;
+        }
+        atual = atual->irmao; // Verifica o próximo irmão
+    }
+    printf("Arquivo ou pasta '%s' não encontrado.\n", nome_antigo);
+    return 0;
+}
+
+int echo(char* mensagem) {
+    if (mensagem == NULL) {
+        printf("Mensagem inválida.\n");
+        return 0;
+    }
+    printf("%s\n", mensagem);
+    return 1;
+}
