@@ -179,10 +179,6 @@ int list(Arvore* raiz) {
         return 0;
     }
     char* diretorio = (*raiz)->nome ? (*raiz)->nome : "raiz"; // Se não tiver nome, assume raiz
-    if (diretorio == NULL) {
-        printf("Diretório não encontrado.\n");
-        return 0;
-    }
 
     NO* atual = *raiz;
 
