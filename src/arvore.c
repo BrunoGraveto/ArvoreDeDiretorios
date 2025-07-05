@@ -31,7 +31,18 @@ int uploadArquivos(Arvore* raiz, char* caminho) {
     informar que existe um diretório “Meus Documentos” e “Meus Downloads”
     senão existe alternativas então imprimi “Diretório não encontrado”
 */
-int cd(Arvore* raiz, char* diretorio) {
+int cd(Arvore atual, char* diretorio) {
+    if (atual == NULL || diretorio == NULL) {
+        printf("Diretório não encontrado.\n");
+        return 0;
+    }
+
+    if (strcmp(diretorio, "..") == 0 || strcmp(diretorio, ".") == 0 || strcmp(diretorio, atual->pai->nome) == 0) {
+        return atual->pai ? atual->pai : atual;
+    }
+
+    
+
     return 0;
 }
 
@@ -94,6 +105,123 @@ int mkdir(Arvore* raiz, char* arg) {
         return 0;
     
     return 1;
+}
+
+int exit(Arvore* raiz) {
+    if (raiz == NULL || *raiz == NULL) {
+        printf("Árvore não inicializada.\n");
+        return 0;
+    }
+    liberarArvore(raiz);
+    return 1;
+}
+
+/*
+    Função que inicia o loop terminal, deve ser chamada no main.
+    comando\0arg\0
+*/
+void terminal(Arvore* raiz) {
+    if (raiz == NULL) {
+        printf("Árvore não inicializada.\n");
+        exit(1);
+    }
+    Arvore atual = raiz;
+    char linha[256];
+    char *comando, *arg;
+
+    printf("-------- Bem-vindo ao terminal! --------\n");
+    printf("Digite 'help' para ver os comandos disponíveis.\n");
+
+    while (1) {
+        // Prompt
+        printf("[%s] $ ", atual->caminho ? atual->caminho : "raiz");
+
+        // Lê a linha inteira
+        if (!fgets(linha, sizeof(linha), stdin)) {
+            // EOF ou erro de leitura
+            printf("\n");
+            break;
+        }
+
+        // Remove o '\n' final, se presente
+        linha[strcspn(linha, "\n")] = '\0';
+
+        // Separa em tokens: comando e, opcionalmente, argumento
+        comando = strtok(linha, " \t");
+        arg     = strtok(NULL,  " \t");
+
+        if (comando == NULL) {
+            // Linha em branco: apenas repete o prompt
+            continue;
+        }
+
+        // Comandos
+        if (strcmp(comando, "cd") == 0) {
+            if (arg == NULL) {
+                printf("Uso: cd <diretório>\n");
+            } else {
+                cd(&atual, arg);  // supondo que cd atualize o ponteiro 'atual'
+            }
+        }
+        else if (strcmp(comando, "ls") == 0) {
+            ls(atual, arg);    // se ls não precisar de arg, você pode passar NULL
+        }
+        else if (strcmp(comando, "mkdir") == 0) {
+            if (arg == NULL) {
+                printf("Uso: mkdir <nome>\n");
+            } else {
+                mkdir(atual, arg);
+            }
+        }
+        else if (strcmp(comando, "rm") == 0) {
+            if (arg == NULL) {
+                printf("Uso: rm <nome>\n");
+            } else {
+                rm(atual, arg);
+            }
+        }
+        else if (strcmp(comando, "search") == 0) {
+            if (arg == NULL) {
+                printf("Uso: search <termo>\n");
+            } else {
+                if(search(atual, arg) != NULL) {
+                    printf("Arquivo ou pasta encontrado: %s\n", search(atual, arg));
+                } else {
+                    printf("Arquivo ou pasta não encontrado.\n");
+                }
+            }
+        }
+        else if (strcmp(comando, "help") == 0) {
+            help();
+        }
+        else if (strcmp(comando, "exit") == 0) {
+            liberarArvore(raiz); // Libera a memória da árvore antes de sair
+            exit(0);
+        }
+        else {
+            printf("Comando '%s' não reconhecido. Digite 'help' para ver os disponíveis.\n", comando);
+        }
+    }
+
+    printf("Saindo do terminal.\n");
+}
+
+/*
+    Exibe o menu de ajuda.
+*/
+
+void help() {
+    printf("Comandos disponíveis:\n");
+    printf(" - cd <diretório> - Muda para o diretório especificado.\n");
+    printf(" - ls - Lista os arquivos e pastas no diretório atual.\n");
+    printf(" - mkdir <nome> - Cria um novo diretório.\n");
+    printf(" - rm <nome> - remove  um  pasta  e  seus  arquivos,  deve  fazer  uma  liberação recursiva.\n");
+    printf(" - search <nome> - busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”.\n");
+    printf(" - clear - Limpa a tela do terminal.\n");
+    printf(" - help - Exibe este menu de ajuda.\n");
+    printf(" - exit - Sai do terminal.\n");
+    printf("\n------------------------------------------\n");
+    
 }
 
 //////////////////////////////////////////////////////////////////////////////////

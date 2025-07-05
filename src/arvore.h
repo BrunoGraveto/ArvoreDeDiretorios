@@ -23,13 +23,16 @@ Arvore* criarArvore();
 int uploadArquivos(Arvore* raiz, char* caminho);
 
 // Funções de usuário
-int cd(Arvore* raiz, char* diretorio);
+int cd(Arvore raiz, char* diretorio);
 char* search(Arvore* raiz, char* arg); //busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”  e  informa  a sua localização
 int rm(Arvore* raiz, char* diretorio); //Remove uma pasta e seus arquivos
 int list(Arvore* raiz, char* diretorio);
 int mkdir(Arvore* raiz, char* arg);
+void terminal(Arvore* raiz); //Função que inicia o loop terminal
+void help(); //Exibe o menu de ajuda
+void liberarArvore(Arvore* raiz); //Libera a memória alocada para a árvore
 
 //Funções Extras
-//bo adicionar as extrar aqui pra separar e deixar bonitinho
+//bo adicionar as extras aqui pra separar e deixar bonitinho
 
 #endif
