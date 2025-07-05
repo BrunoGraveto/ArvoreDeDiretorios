@@ -75,13 +75,14 @@ Arvore cd(NO* atual, char* diretorio) {
     NO* filho = atual->filho;
     while(filho != NULL){
         // Verifica se o nome do nó atual é igual ao diretório
-        if (filho->nome != NULL && strcmp(filho->nome, diretorio) == 0) {
+        if (filho->nome != NULL && strcmp(filho->nome, diretorio) == 0 && filho->extensao == NULL) {
             return filho; // Retorna o nó atual se for o diretório desejado
         }
 
         filho = filho->irmao; // Muda para o irmão
     }
-
+    // Se não encontrou, verifica se há sugestões
+    printf("Diretório não encontrado.\n");
     return NULL;
 }
 
@@ -347,6 +348,8 @@ void help() {
     printf(" - search <nome> - busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”.\n");
     printf(" - clear - Limpa a tela do terminal.\n");
     printf(" - help - Exibe este menu de ajuda.\n");
+    printf(" - echo <mensagem> - Exibe a mensagem especificada.\n");
+    printf(" - rename <nome_antigo> <nome_novo> - Renomeia um arquivo ou diretório.\n");
     printf(" - exit - Sai do terminal.\n");
     printf("\n------------------------------------------\n");
     
