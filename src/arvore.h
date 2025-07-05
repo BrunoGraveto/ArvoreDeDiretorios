@@ -21,6 +21,7 @@ typedef struct NO* Arvore;
 // Funções internas
 Arvore* criarArvore();
 int uploadArquivos(Arvore* raiz, char* caminho);
+void removeRec (NO* no);//função auxiliar para remoção de pastas e arquivos
 
 // Funções de usuário
 int cd(Arvore* raiz, char* diretorio);
@@ -30,6 +31,5 @@ int list(Arvore* raiz, char* diretorio);
 int mkdir(Arvore* raiz, char* arg);
 
 //Funções Extras
-void removeRec (NO* no);
 
 #endif

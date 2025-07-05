@@ -101,7 +101,7 @@ int rm(Arvore* raiz, char* diretorio) {
                 *raiz = atual->irmao;
 
             } else {
-                
+
                 if (atual->pai->filho == atual) {
                     atual->pai->filho = atual->irmao;
 
@@ -144,7 +144,43 @@ int rm(Arvore* raiz, char* diretorio) {
     Lista todos os componentes dentro da pasta atual.
 */
 int list(Arvore* raiz, char* diretorio) {
+    if(raiz == NULL || *raiz == NULL || diretorio == NULL){
+        return 0;
+    }
 
+    NO* atual = *raiz;
+    NO* ult = NULL;
+
+    while(atual != NULL){
+        if(strcmp(atual->nome, diretorio) == 0){
+            NO* comp = atual->filho;
+
+            if(comp == NULL){
+                printf("vazio\n");
+                return 1;
+            }
+
+            printf("\nArquivos da Pasta %s\n", diretorio);
+            while(comp != NULL){
+                printf("- %s\n", comp->nome);
+                comp = comp->irmao;
+            }
+            return 1;
+        }
+
+        if (atual->filho != NULL && ult != atual->filho) {
+            ult = atual;
+            atual = atual->filho;
+
+        } else if (atual->irmao != NULL && ult != atual->irmao) {
+            ult = atual;
+            atual = atual->irmao;
+
+        } else {
+            ult = atual;
+            atual = atual->pai;
+        }
+    }
     return 0;
 }
 
