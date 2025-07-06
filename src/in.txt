@@ -1,0 +1,12 @@
+raiz/Arquivos e Programas/Firefox
+raiz/Arquivos e Programas/Chrome
+raiz/Arquivos e Programas/Opera
+raiz/Meus Documentos/apresentacao.ppt
+raiz/Meus Documentos/relatorio.doc
+raiz/Meus Documentos/fontes
+raiz/Meus Documentos/fontes/main.c
+raiz/Meus Documentos/fontes/main.h
+raiz/Meus Documentos/imagens
+raiz/Meus Downloads/7zip.exe
+raiz/Meus Downloads/t2.rar
+raiz/aa/aaa.rar
