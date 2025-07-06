@@ -36,26 +36,12 @@ O programa deve ser capaz de:
 | `help`           | Exibe a lista de comandos e suas descrições. |
 | `exit`           | Encerra o programa liberando a memória alocada. |
 
-## 🛠 Requisitos
+## 📄 Documentação
 
-- Leitura e interpretação correta do arquivo `in.txt`.
-- Implementação completa dos comandos solicitados.
-- Organização modular com separação em `.h`, `.c` e `main.c`.
-- Tratamento de erros e mensagens de sugestão ao usuário.
+Um documento anexo ao repositório descreve os requisios, funcionamento interno do código, estratégias utilizadas na implementação e dificuldades encontradas no desenvolvimento do projeto.
 
-## 📄 Relatório
-
-Um documento anexo ao repositório descreve o funcionamento interno do código, estratégias utilizadas na implementação e dificuldades encontradas no desenvolvimento do projeto.
-
-## ✅ Avaliação
-
-A avaliação será baseada nos seguintes critérios:
-
-- Cumprimento dos requisitos do enunciado.
-- Organização e clareza do código.
-- Qualidade do relatório.
-- Funcionalidade e robustez do programa.
-- Pontos extras para funcionalidades adicionais ou diferenciais técnicos.
+📎 Acesse a documentação completa em:  
+[**Relatório Técnico - PDF**](./docs/Documentação.pdf)
 
 ---
 
