@@ -41,7 +41,7 @@ O programa deve ser capaz de:
 Um documento anexo ao repositório descreve os requisios, funcionamento interno do código, estratégias utilizadas na implementação e dificuldades encontradas no desenvolvimento do projeto.
 
 📎 Acesse a documentação completa em:  
-[**Relatório Técnico - PDF**](./docs/Documentação.pdf)
+[**Documento - PDF**](./docs/Documentação.pdf)
 
 ---
 
