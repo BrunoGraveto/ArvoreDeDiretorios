@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 // Struct Nó
 typedef struct NO {
     char *caminho;
@@ -22,25 +23,27 @@ typedef struct NO* Arvore;
 */  
 Arvore* criarArvore();
 int uploadArvore(Arvore* raiz, char* caminho);
-void removeRec (NO* no);//função auxiliar para remoção de pastas e arquivos
-void liberarArvore(Arvore* raiz); //Libera a memória alocada para a árvore
+void removeRec (NO* no);
+void liberarArvore(Arvore* raiz); 
+NO* buscaCaminhoRecursivo(NO* no, char* caminhoCompleto);
+NO* searchPorCaminho(Arvore* raiz, char* caminhoCompleto);
 
 // Funções de usuário
-NO* cd(NO* atual, char* diretorio);
-char* search(Arvore* raiz, char* arg); //busca  um  arquivo  ou  pasta  pelo  seu  nome  “arg”  e  informa  a sua localização
-int rm(Arvore* raiz, char* diretorio); //Remove uma pasta e seus arquivos
+NO* cd(NO* atual, char* caminho);
+char* search(Arvore* raiz, char* arg); 
+int rm(Arvore* raiz, char* caminho); 
 int list(Arvore* raiz);
 int mkdir_(Arvore* raiz, char* arg);
-void terminal(Arvore* raiz); //Função que inicia o loop terminal
-void help(); //Exibe o menu de ajuda
-int exitPrograma(Arvore* raiz); //Sai do terminal e libera a memória da árvore
-int clear(); //Limpa a tela do terminal
+void terminal(Arvore* raiz); 
+void help();
+int exitPrograma(Arvore* raiz);
+int clear(); 
 
 
 //Funções Extras
-int rename_nome(Arvore* raiz, char* nome_antigo, char* nome_novo); //Renomeia um arquivo ou diretório
-int echo(char* mensagem); //Exibe a mensagem especificada
-int listAll(Arvore* raiz, char* diretorio);
+int rename_nome(Arvore* raiz, char* arg); 
+int echo(char* mensagem); 
+int listAll(Arvore* raiz, char* caminho);
 int mkarq(Arvore* raiz, char* caminhoCompleto);
 NO* searchPorCaminho(Arvore* raiz, char* caminhoCompleto);
 
